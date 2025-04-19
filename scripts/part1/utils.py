@@ -55,14 +55,16 @@ def run_remote_command(remote_ip, command_line, block=True):
         p = Popen(args, stdout=subprocess.PIPE, text=True)
         return p
 
-def build_mcperf_on_remote(server_ip: str):
-    copy_command = f"scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/cloud-computing scripts/part1/compile_mcperf.sh ubuntu@{server_ip}:~/"
+def copy_on_remote(server_ip, file_path):
+    copy_command = f"scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/cloud-computing {file_path} ubuntu@{server_ip}:~/"
     scp_p = run(shlex.split(copy_command))
+
+def build_mcperf_on_remote(server_ip: str):
+    copy_on_remote(server_ip, "scripts/part1/compile_mcperf.sh")
     run_remote_command(server_ip, "/bin/bash ~/compile_mcperf.sh")
 
-def clean_remote_state(server_ip):
-    copy_command = f"scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/cloud-computing scripts/part1/kill_running_process.sh ubuntu@{server_ip}:~/"
-    scp_p = run(shlex.split(copy_command))
+def kill_mcperf_on_remote(server_ip):
+    copy_on_remote(server_ip, "scripts/part1/kill_running_process.sh")
     run_remote_command(server_ip, "/bin/bash ~/kill_running_process.sh mcperf")
 
 
